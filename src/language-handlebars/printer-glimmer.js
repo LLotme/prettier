@@ -159,7 +159,7 @@ function print(path, options, print) {
       /* if `{{my-component}}` (or any text containing "{{")
        * makes it to the TextNode, it means it was escaped,
        * so let's print it escaped, ie.; `\{{my-component}}` */
-      let text = node.chars.replaceAll("{{", "\\{{");
+      let text = node.chars.replaceAll("{{", String.raw`\{{`);
 
       const attrName = getCurrentAttributeName(path);
 
@@ -366,7 +366,10 @@ function print(path, options, print) {
       ];
     }
     case "PathExpression":
-      return printPathExpression(node);
+      return printPathExpression(node, print);
+
+    case "AtHead":
+      return node.name;
 
     case "BooleanLiteral":
       return String(node.value);
@@ -386,6 +389,8 @@ function print(path, options, print) {
     case "NullLiteral":
       return "null";
 
+    case "VarHead": // Handled in `printPathExpression`
+    case "ThisHead": // Handled in `printPathExpression`
     default:
       /* c8 ignore next */
       throw new UnexpectedNodeError(node, "Handlebars");
@@ -786,12 +791,12 @@ const isPathExpressionPartNeedBrackets = (part, index) =>
   Array.prototype.some.call(part, (character) =>
     PATH_EXPRESSION_FORBIDDEN_CHARACTERS.has(character),
   );
-// TODO[@fisker]: Print `head` via `print`
-function printPathExpression(node) {
-  if (
-    node.head.type === "AtHead" ||
-    (node.tail.length === 0 && node.original.includes("/"))
-  ) {
+function printPathExpression(node, print) {
+  if (node.head.type === "AtHead") {
+    return print("head");
+  }
+
+  if (node.tail.length === 0 && node.original.includes("/")) {
     // check if node has data, or
     // check if node is a legacy path expression (and leave it alone)
     return node.original;
