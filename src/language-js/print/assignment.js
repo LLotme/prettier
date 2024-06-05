@@ -138,6 +138,7 @@ function chooseLayout(path, options, print, leftDoc, rightPropertyName) {
   }
 
   if (
+    node.type === "ImportAttribute" ||
     (rightNode.type === "CallExpression" &&
       rightNode.callee.name === "require") ||
     // do not put values on a separate line from the key in json
@@ -230,7 +231,7 @@ function shouldBreakAfterOperator(path, options, print, hasShortKey) {
 
   let node = rightNode;
   const propertiesForPath = [];
-  for (;;) {
+  while (true) {
     if (
       node.type === "UnaryExpression" ||
       node.type === "AwaitExpression" ||
