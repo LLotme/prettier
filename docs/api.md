@@ -6,7 +6,8 @@ title: API
 If you want to run Prettier programmatically, check this page out.
 
 ```js
-import * as prettier from "prettier";
+import * as prettier from "prettier"
+;
 ```
 
 Our public APIs are all asynchronous, if you must use synchronous version for some reason, you can try [`@prettier/sync`](https://github.com/prettier/prettier-synchronized).
